@@ -1,0 +1,83 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:template_name",
+ "creation": "2022-02-09 18:21:15.284486",
+ "doctype": "DocType",
+ "document_type": "Setup",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "template_name",
+  "status",
+  "linked_doctype",
+  "is_default_template",
+  "template_type",
+  "section_break_4",
+  "template_body"
+ ],
+ "fields": [
+  {
+   "fieldname": "template_name",
+   "fieldtype": "Data",
+   "label": "Template Name",
+   "unique": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status"
+  },
+  {
+   "fieldname": "linked_doctype",
+   "fieldtype": "Link",
+   "label": "Linked Doctype",
+   "options": "DocType"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_default_template",
+   "fieldtype": "Check",
+   "label": "Is Default Template"
+  },
+  {
+   "fieldname": "template_type",
+   "fieldtype": "Select",
+   "label": "Template Type",
+   "options": "text\ntemplate"
+  },
+  {
+   "fieldname": "section_break_4",
+   "fieldtype": "Section Break"
+  },
+  {
+   "description": "Template format in json, replace placeholders with doc fields",
+   "fieldname": "template_body",
+   "fieldtype": "Text",
+   "label": "Template Body"
+  }
+ ],
+ "links": [],
+ "modified": "2022-02-10 07:21:51.639194",
+ "modified_by": "Administrator",
+ "module": "Whatsapp Business",
+ "name": "Whatsapp Business Template",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}

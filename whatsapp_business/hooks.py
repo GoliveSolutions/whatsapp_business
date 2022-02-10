@@ -14,7 +14,10 @@ app_license = "MIT"
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/whatsapp_business/css/whatsapp_business.css"
-# app_include_js = "/assets/whatsapp_business/js/whatsapp_business.js"
+app_include_js = [
+    "/assets/whatsapp_business/js/whatsapp_business.js",
+    "/assets/whatsapp_business/js/whatsapp_composer.js",
+]
 
 # include js, css files in header of web template
 # web_include_css = "/assets/whatsapp_business/css/whatsapp_business.css"
@@ -32,6 +35,7 @@ app_license = "MIT"
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
+doctype_js = {"Notification": "public/js/notification.js"}
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
@@ -44,7 +48,7 @@ app_license = "MIT"
 
 # website user home page (by Role)
 # role_home_page = {
-#	"Role": "home_page"
+# 	"Role": "home_page"
 # }
 
 # Generators
@@ -57,7 +61,7 @@ app_license = "MIT"
 # ------------
 
 # before_install = "whatsapp_business.install.before_install"
-# after_install = "whatsapp_business.install.after_install"
+after_install = "whatsapp_business.install.after_install"
 
 # Desk Notifications
 # ------------------
@@ -80,22 +84,19 @@ app_license = "MIT"
 # DocType Class
 # ---------------
 # Override standard doctype classes
-
-# override_doctype_class = {
-# 	"ToDo": "custom_app.overrides.CustomToDo"
-# }
+override_doctype_class = {
+    "Notification": "whatsapp_business.controllers.whatsapp_notification.WABANotification"
+}
 
 # Document Events
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-#	}
-# }
+doc_events = {
+    "Notification": {
+        "validate": "whatsapp_business.controllers.doc_events.on_validate_notification",
+    }
+}
 
 # Scheduled Tasks
 # ---------------
@@ -146,24 +147,22 @@ app_license = "MIT"
 # --------------------
 
 user_data_fields = [
-	{
-		"doctype": "{doctype_1}",
-		"filter_by": "{filter_by}",
-		"redact_fields": ["{field_1}", "{field_2}"],
-		"partial": 1,
-	},
-	{
-		"doctype": "{doctype_2}",
-		"filter_by": "{filter_by}",
-		"partial": 1,
-	},
-	{
-		"doctype": "{doctype_3}",
-		"strict": False,
-	},
-	{
-		"doctype": "{doctype_4}"
-	}
+    {
+        "doctype": "{doctype_1}",
+        "filter_by": "{filter_by}",
+        "redact_fields": ["{field_1}", "{field_2}"],
+        "partial": 1,
+    },
+    {
+        "doctype": "{doctype_2}",
+        "filter_by": "{filter_by}",
+        "partial": 1,
+    },
+    {
+        "doctype": "{doctype_3}",
+        "strict": False,
+    },
+    {"doctype": "{doctype_4}"},
 ]
 
 # Authentication and authorization
@@ -172,4 +171,3 @@ user_data_fields = [
 # auth_hooks = [
 # 	"whatsapp_business.auth.validate"
 # ]
-

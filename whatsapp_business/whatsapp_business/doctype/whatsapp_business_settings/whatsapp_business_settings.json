@@ -1,0 +1,71 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-02-09 17:58:07.626392",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "api_endpoint",
+  "api_key",
+  "column_break_3",
+  "is_sandbox",
+  "sandbox_api_endpoint",
+  "sandbox_api_key"
+ ],
+ "fields": [
+  {
+   "fieldname": "api_endpoint",
+   "fieldtype": "Data",
+   "label": "API Endpoint"
+  },
+  {
+   "fieldname": "api_key",
+   "fieldtype": "Small Text",
+   "label": "API Key"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_sandbox",
+   "fieldtype": "Check",
+   "label": "Is Sandbox"
+  },
+  {
+   "fieldname": "sandbox_api_endpoint",
+   "fieldtype": "Data",
+   "label": "Sandbox Api Endpoint"
+  },
+  {
+   "fieldname": "sandbox_api_key",
+   "fieldtype": "Small Text",
+   "label": "Sandbox Api Key"
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2022-02-09 17:58:20.777608",
+ "modified_by": "Administrator",
+ "module": "Whatsapp Business",
+ "name": "Whatsapp Business Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "track_changes": 1
+}
