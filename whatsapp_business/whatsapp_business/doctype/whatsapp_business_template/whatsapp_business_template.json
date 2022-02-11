@@ -20,7 +20,7 @@
   "column_break_16",
   "message",
   "preview_message",
-  "mobile_number",
+  "mobile_no",
   "send_test_message",
   "template_details_section",
   "status",
@@ -153,13 +153,13 @@
   },
   {
    "description": "Mobile number <strong>WITH</strong> Country Code and no '+'",
-   "fieldname": "mobile_number",
+   "fieldname": "mobile_no",
    "fieldtype": "Data",
    "label": "Mobile Number"
   }
  ],
  "links": [],
- "modified": "2022-02-11 17:00:05.999949",
+ "modified": "2022-02-11 21:30:59.017343",
  "modified_by": "Administrator",
  "module": "Whatsapp Business",
  "name": "Whatsapp Business Template",

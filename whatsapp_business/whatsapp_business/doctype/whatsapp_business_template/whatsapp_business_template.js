@@ -108,6 +108,7 @@ frappe.ui.form.on("Whatsapp Business Template", {
     return frappe.call({
       method: "send_test_message",
       doc: frm.doc,
+      args:{mobile_no: frm.doc.mobile_no},
       callback: () => {
         frappe.msgprint("Your message has been sent.");
       },

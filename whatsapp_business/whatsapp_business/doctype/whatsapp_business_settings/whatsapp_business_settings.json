@@ -10,6 +10,7 @@
   "api_key",
   "default_country_code",
   "column_break_3",
+  "test_wa_id",
   "is_sandbox",
   "sandbox_api_endpoint",
   "sandbox_api_key"
@@ -49,12 +50,18 @@
    "fieldname": "default_country_code",
    "fieldtype": "Data",
    "label": "Default Country Code"
+  },
+  {
+   "description": "Whatsapp number for testing. If set, all messages will be sent to this number only.",
+   "fieldname": "test_wa_id",
+   "fieldtype": "Data",
+   "label": "Test WA Id"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-02-11 06:14:06.045835",
+ "modified": "2022-02-11 22:09:21.043124",
  "modified_by": "Administrator",
  "module": "Whatsapp Business",
  "name": "Whatsapp Business Settings",
