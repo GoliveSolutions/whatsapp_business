@@ -34,13 +34,17 @@ class WABA(object):
             )
 
     def __init__(self):
-        self.settings = frappe.get_doc("Whatsapp Business Settings")
-        self.messages_endpoint = "https://{api_endpoint}/v1/messages".format(
-            self.settings.as_dict()
+        self.settings = frappe.get_doc("Whatsapp Business Settings").as_dict()
+
+        self.messages_endpoint = "{api_endpoint}/v1/messages".format(
+            **self.settings
+        )
+        self.templates_endpoint = "{api_endpoint}/v1/configs/templates".format(
+            **self.settings
         )
 
     def _send(
-        self, mobile_no, template_name, doctype=None, docname=None, media_link=None
+        self, mobile_no="", template_name="", doctype=None, docname=None, media_link=None, doc={}
     ):
         """
         https://docs.360dialog.com/whatsapp-api/whatsapp-api/sandbox#send-template-message
@@ -62,26 +66,28 @@ class WABA(object):
 
         headers = self.get_headers()
 
-        message = self.get_message(
-            template_name, mobile_no, doctype, docname, media_link=None
-        )
+        message =   self.get_message(
+                template_name, mobile_no, doctype, docname, media_link=None, doc = doc
+            )
 
-        print("**\n" * 10, message)
+        # print("**\n" * 10, message)
 
-        # response = requests.request("POST", self.messages_endpoint, headers=headers, data=message)
+        response = requests.request("POST", self.messages_endpoint, headers=headers, data=message)
 
-        # if response.ok:
-        #     result = response.json().get("result")
-        #     if not response.json().get("result"):
-        #         logger.debug(response.text)
-        #         frappe.log_error(
-        #             message=response.text, title=_("Whatsapp Business Message Error")
-        #         )
-        # else:
-        #     logger.debug(response.text)
-        #     frappe.log_error(
-        #         msg=response.text, title=_("Whatsapp Business Message Error")
-        #     )
+        print('**\n'*10,response.json())
+
+        if response.ok:
+            messages = response.json().get("messages",[])
+            if not messages or not messages[0].get('id'):
+                logger.debug(response.text)
+                frappe.log_error(
+                    message=response.text, title=_("Whatsapp Business Message Error")
+                )
+        else:
+            logger.debug(response.text)
+            frappe.log_error(
+                response.text, title=_("Whatsapp Business Message Error")
+            )
 
     def get_headers(self):
         headers = {
@@ -92,65 +98,49 @@ class WABA(object):
         return headers
 
     def get_message(
-        self, template_name, mobile_no, doctype=None, docname=None, media_link=None
+        self, template_name, mobile_no, doctype=None, docname=None, media_link=None, doc ={}
     ):
 
-        template = frappe.get_doc("Whatsapp Business Template", template_name)
+        template =frappe.get_doc("Whatsapp Business Template", template_name)
         doc = frappe.get_doc(doctype, docname).as_dict()
 
         mobile_no = cstr(mobile_no)
-        if not mobile_no.startswith(self.settings.default_country_code):
+        if self.settings.default_country_code and not mobile_no.startswith(self.settings.default_country_code):
             mobile_no = self.settings.default_country_code + mobile_no
+
         doc["to"] = mobile_no
 
         doc["media_link"] = media_link
 
-        return frappe.render_template(template, doc)
+        return frappe.render_template(template.message, { "doc" : doc })
 
-    # def sync_templates(self):
-    #     headers = self.get_headers()
-    #     api_endpoint = frappe.db.get_singles_value(
-    #         "Whatsapp Business Settings", "api_endpoint"
-    #     )
+    
+    def get_template_names(self):
+        templates = self.get_templates()
+        return ["{name} ({language})".format(**d) for d in templates if d.get("status") == "approved"]
 
-    #     url = "https://{0}/api/v1/getMessageTemplates".format(api_endpoint)
+    def get_templates(self):
+        waba_templates = frappe.cache().get_value('waba_templates')
+        if not waba_templates:
+            headers = self.get_headers()
+            response = requests.request("GET", self.templates_endpoint, headers=headers,)
+            print('**\n'*10,response.json())
+            waba_templates =  response.json().get("waba_templates")
+            frappe.cache().set_value('waba_templates', waba_templates, expires_in_sec=60*60)
 
-    #     response = requests.request("GET", url, headers=headers)
-    #     if response.ok:
-    #         if not response.json().get("result") == "success":
-    #             logger.debug(response.text)
-    #             frappe.log_error(
-    #                 message=response.text,
-    #                 title=_("Whatsapp Business Sync Template Error"),
-    #             )
-    #         self.make_templates(response.json())
-    #     else:
-    #         logger.debug(response.text)
-    #         frappe.log_error(
-    #             msg=response.text, title=_("Whatsapp Business Sync Template Error")
-    #         )
+        return waba_templates 
 
-    # def make_templates(self, args):
-    #     for temp in args.get("messageTemplates"):
-    #         try:
-    #             doc = frappe.new_doc("Whatsapp Business Template")
-    #             doc.template_name = temp.get("elementName")
-    #             doc.category = temp.get("category")
-    #             doc.status = temp.get("status")
-    #             doc.is_document_template = frappe.utils.cint(
-    #                 (temp.get("header", {}) or {}).get("typeString", "") == "document"
-    #             )
-    #             doc.body = temp.get("bodyOriginal")
-    #             for d in temp.get("customParams"):
-    #                 doc.append(
-    #                     "parameters",
-    #                     {
-    #                         "parameter_name": d.get("paramName"),
-    #                         "parameter_value": d.get("paramValue"),
-    #                     },
-    #                 )
-    #             doc.insert(ignore_permissions=True)
-    #         except frappe.DuplicateEntryError:
-    #             pass
+    
+@frappe.whitelist()
+def get_templates():   
+    return WABA().get_templates() 
 
-    #     frappe.db.commit()
+@frappe.whitelist()
+def get_template_names():
+    return WABA().get_template_names()
+
+@frappe.whitelist()
+def get_template(waba_template_name="",language=""):   
+    templates =  WABA().get_templates()     
+    return [ d for d in templates if d.get("name") == waba_template_name and d.get("language")==language]
+        

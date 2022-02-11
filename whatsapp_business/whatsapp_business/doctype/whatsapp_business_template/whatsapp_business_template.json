@@ -9,12 +9,27 @@
  "engine": "InnoDB",
  "field_order": [
   "template_name",
-  "status",
   "linked_doctype",
   "is_default_template",
-  "template_type",
-  "section_break_4",
-  "template_body"
+  "is_enabled",
+  "waba_section",
+  "message_type",
+  "waba_template_name",
+  "select_template",
+  "message_parameters",
+  "column_break_16",
+  "message",
+  "preview_message",
+  "mobile_number",
+  "send_test_message",
+  "template_details_section",
+  "status",
+  "category",
+  "language",
+  "namespace",
+  "rejected_reason",
+  "column_break_18",
+  "template_json"
  ],
  "fields": [
   {
@@ -22,11 +37,6 @@
    "fieldtype": "Data",
    "label": "Template Name",
    "unique": 1
-  },
-  {
-   "fieldname": "status",
-   "fieldtype": "Data",
-   "label": "Status"
   },
   {
    "fieldname": "linked_doctype",
@@ -41,24 +51,115 @@
    "label": "Is Default Template"
   },
   {
-   "fieldname": "template_type",
+   "fieldname": "send_test_message",
+   "fieldtype": "Button",
+   "label": "Send Test Message"
+  },
+  {
+   "depends_on": "eval:doc.message_type=='template'",
+   "description": "Replace default values with appropriate doc fields",
+   "fieldname": "message_parameters",
+   "fieldtype": "Table",
+   "label": "Message Parameters",
+   "options": "SMS Parameter"
+  },
+  {
+   "fieldname": "message_type",
    "fieldtype": "Select",
-   "label": "Template Type",
-   "options": "text\ntemplate"
+   "label": "WABA Message Type",
+   "options": "template\ntext"
   },
   {
-   "fieldname": "section_break_4",
-   "fieldtype": "Section Break"
+   "depends_on": "eval:doc.message_type=='template';",
+   "fieldname": "waba_template_name",
+   "fieldtype": "Data",
+   "label": "WABA Template Name"
   },
   {
-   "description": "Template format in json, replace placeholders with doc fields",
-   "fieldname": "template_body",
+   "fieldname": "waba_section",
+   "fieldtype": "Section Break",
+   "label": "WABA"
+  },
+  {
+   "default": "0",
+   "fieldname": "is_enabled",
+   "fieldtype": "Check",
+   "label": "Is Enabled"
+  },
+  {
+   "fieldname": "message",
    "fieldtype": "Text",
-   "label": "Template Body"
+   "label": "Message",
+   "read_only_depends_on": "eval:doc.message_type=='template';"
+  },
+  {
+   "fieldname": "language",
+   "fieldtype": "Data",
+   "label": "Language",
+   "read_only": 1
+  },
+  {
+   "fieldname": "namespace",
+   "fieldtype": "Data",
+   "label": "Namespace",
+   "read_only": 1
+  },
+  {
+   "fieldname": "rejected_reason",
+   "fieldtype": "Data",
+   "label": "Rejected Reason",
+   "read_only": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Data",
+   "label": "Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Data",
+   "label": "Category",
+   "read_only": 1
+  },
+  {
+   "fieldname": "template_json",
+   "fieldtype": "Text",
+   "label": "Template Json"
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "template_details_section",
+   "fieldtype": "Section Break",
+   "label": "Template Details"
+  },
+  {
+   "fieldname": "column_break_18",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.message_type=='template';",
+   "fieldname": "select_template",
+   "fieldtype": "Button",
+   "label": "Select Template"
+  },
+  {
+   "fieldname": "preview_message",
+   "fieldtype": "Button",
+   "label": "Preview Message"
+  },
+  {
+   "description": "Mobile number <strong>WITH</strong> Country Code and no '+'",
+   "fieldname": "mobile_number",
+   "fieldtype": "Data",
+   "label": "Mobile Number"
   }
  ],
  "links": [],
- "modified": "2022-02-10 07:21:51.639194",
+ "modified": "2022-02-11 17:00:05.999949",
  "modified_by": "Administrator",
  "module": "Whatsapp Business",
  "name": "Whatsapp Business Template",
