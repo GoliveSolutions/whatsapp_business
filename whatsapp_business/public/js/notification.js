@@ -28,8 +28,8 @@ frappe.ui.form.on("Notification", {
     }
 
     if (frm.doc.whatsapp_business_template_cf) {
-      frappe.db.get_value('Whatsapp Business Template', { name: frm.doc.whatsapp_business_template_cf }, 'template_type', (r) => {
-        frm.set_value('attach_print', r.template_type == 'template');
+      frappe.db.get_value('Whatsapp Business Template', { name: frm.doc.whatsapp_business_template_cf }, 'message_type', (r) => {
+        frm.set_value('attach_print', r.message_type == 'template');
       });
     }
 

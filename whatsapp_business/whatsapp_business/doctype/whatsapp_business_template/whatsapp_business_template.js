@@ -84,6 +84,7 @@ frappe.ui.form.on("Whatsapp Business Template", {
           }
         }
         frm.set_value("message", message);
+        frm.set_value("category", templates[0].category);
         frm.set_value("language", templates[0].language);
         frm.set_value("namespace", templates[0].namespace);
         frm.set_value("rejected_reason", templates[0].rejected_reason);
@@ -108,7 +109,7 @@ frappe.ui.form.on("Whatsapp Business Template", {
     return frappe.call({
       method: "send_test_message",
       doc: frm.doc,
-      args:{mobile_no: frm.doc.mobile_no},
+      args: { mobile_no: frm.doc.mobile_no },
       callback: () => {
         frappe.msgprint("Your message has been sent.");
       },

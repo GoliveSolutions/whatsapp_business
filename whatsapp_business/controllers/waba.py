@@ -59,7 +59,7 @@ class WABA(object):
         response = requests.request(
             "POST", self.messages_endpoint, headers=headers, data=message)
 
-        print('**\n'*10, response.json())
+        print('**\n'*10, message, response.json())
 
         if response.ok:
             messages = response.json().get("messages", [])
@@ -94,7 +94,7 @@ class WABA(object):
 
         if not template_doc and template_name:
             template_doc = frappe.get_doc(
-                "Whatsapp Business Template", template_name)
+                "Whatsapp Business Template", template_name).as_dict()
 
         mobile_no = cstr(mobile_no)
         if self.settings.default_country_code and not mobile_no.startswith(self.settings.default_country_code):
@@ -130,11 +130,17 @@ class WABA(object):
 
             return frappe.render_template(TEMPLATED_MESSAGE, {"doc": doc, "template_doc": template_doc, "components": json.dumps(components), "mobile_no": mobile_no})
         else:
-            return frappe.render_template(TEXT_MESSAGE, {
-                "doc": doc,
-                "mobile_no": mobile_no,
-                template_doc: template_doc
-            })
+            print(doc, template_doc)
+            from bs4 import BeautifulSoup as soup
+            message = {
+                "recipient_type": "individual",
+                "to": mobile_no,
+                "type": "text",
+                "text": {
+                        "body": soup(frappe.render_template(template_doc.message, {"doc": doc})).get_text(),
+                }
+            }
+            return json.dumps(message)
 
     def get_template_names(self):
         templates = self.get_templates()
@@ -186,14 +192,14 @@ TEMPLATED_MESSAGE = """
 """
 
 TEXT_MESSAGE = """
-    {
-        recipient_type: "individual",
-        to: "{{mobile_no}}",
-        type: "text",
-        text: {
-            body: "{{doc.message}}",
-        },
+{
+    "recipient_type": "individual",
+    "to": "{{mobile_no}}",
+    "type": "text",
+    "text": {
+        "body": "{{template_doc.message | replace("\\n","\\\\n") | tojson(indent=2)}}"
     }
+}
 """
 SAMPLE_TEXT_MESSAGE = """
         payload = '''

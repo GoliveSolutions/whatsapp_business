@@ -8,12 +8,9 @@
  "field_order": [
   "api_endpoint",
   "api_key",
-  "default_country_code",
   "column_break_3",
-  "test_wa_id",
-  "is_sandbox",
-  "sandbox_api_endpoint",
-  "sandbox_api_key"
+  "default_country_code",
+  "test_wa_id"
  ],
  "fields": [
   {
@@ -25,22 +22,6 @@
    "fieldname": "api_key",
    "fieldtype": "Small Text",
    "label": "API Key"
-  },
-  {
-   "default": "0",
-   "fieldname": "is_sandbox",
-   "fieldtype": "Check",
-   "label": "Is Sandbox"
-  },
-  {
-   "fieldname": "sandbox_api_endpoint",
-   "fieldtype": "Data",
-   "label": "Sandbox Api Endpoint"
-  },
-  {
-   "fieldname": "sandbox_api_key",
-   "fieldtype": "Small Text",
-   "label": "Sandbox Api Key"
   },
   {
    "fieldname": "column_break_3",
@@ -61,7 +42,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-02-11 22:09:21.043124",
+ "modified": "2022-02-12 04:56:08.064794",
  "modified_by": "Administrator",
  "module": "Whatsapp Business",
  "name": "Whatsapp Business Settings",

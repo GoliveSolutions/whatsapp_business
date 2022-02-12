@@ -36,11 +36,11 @@ frappe.views.WhatsappComposer = class WhatsappComposer extends (
         linked_doctype: me.frm.doc.doctype,
         is_default_template: 1
       },
-      fields: ["name", "template_type"]
+      fields: ["name", "message_type"]
     }).then((data) => {
       if (data.length) {
         me.dialog.fields_dict.whatsapp_business_template.set_value(data[0].name);
-        me.toggle_document_fields(!data[0].template_type == 'template');
+        me.toggle_document_fields(!data[0].message_type == 'template');
       }
     });
 
@@ -61,7 +61,7 @@ frappe.views.WhatsappComposer = class WhatsappComposer extends (
     let me = this;
     me.dialog.fields_dict.attach_document_print.set_value(!is_hidden);
     for (let f in me.dialog.fields_dict) {
-      if (!['recipients', 'business_whatsapp_template', 'content'].includes(f)) {
+      if (!['recipients', 'whatsapp_business_template', 'content'].includes(f)) {
         me.dialog.set_df_property(f, 'hidden', is_hidden);
       }
     }
@@ -71,9 +71,10 @@ frappe.views.WhatsappComposer = class WhatsappComposer extends (
     }
 
     $(me.dialog.fields_dict.select_print_format.wrapper).toggle(!is_hidden);
-
-    debugger;
     me.dialog.refresh();
+
+    me.dialog.$body.find("div.form-page .form-section:gt(2)").toggle(!is_hidden)
+
   }
 
   get_fields() {
@@ -111,15 +112,17 @@ frappe.views.WhatsappComposer = class WhatsappComposer extends (
           if (templ) {
             frappe.model.with_doc("Whatsapp Business Template", templ, function () {
               let template_doc = frappe.model.get_doc("Whatsapp Business Template", templ);
-              let message = frappe.render_template(template_doc.message, cur_frm.doc)
+              let message = frappe.render_template(template_doc.message, { doc: cur_frm.doc })
 
               me.dialog.set_value("content", message);
 
-              // hide attachment fields if template is not a document template
-              if (cur_dialog) {
-                me.toggle_document_fields(!template_doc.template_type == 'template')
-                me.dialog.refresh();
-              }
+              frappe.timeout(0.6).then(() => {
+                // hide attachment fields if template is not a document template
+                if (cur_dialog) {
+                  me.toggle_document_fields(template_doc.message_type !== 'template')
+                  me.dialog.refresh();
+                }
+              });
               // 
             });
           }
@@ -229,7 +232,7 @@ frappe.views.WhatsappComposer = class WhatsappComposer extends (
     console.log(args)
 
     return frappe.call({
-      method: "whatsapp_business.notification.make_communication",
+      method: "whatsapp_business.controllers.whatsapp_notification.make_communication",
       args: args,
       btn: btn,
       callback: function (r) {

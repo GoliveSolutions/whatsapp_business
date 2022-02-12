@@ -73,7 +73,8 @@
    "depends_on": "eval:doc.message_type=='template';",
    "fieldname": "waba_template_name",
    "fieldtype": "Data",
-   "label": "WABA Template Name"
+   "label": "WABA Template Name",
+   "read_only": 1
   },
   {
    "fieldname": "waba_section",
@@ -159,7 +160,7 @@
   }
  ],
  "links": [],
- "modified": "2022-02-11 21:30:59.017343",
+ "modified": "2022-02-12 05:00:00.829099",
  "modified_by": "Administrator",
  "module": "Whatsapp Business",
  "name": "Whatsapp Business Template",
