@@ -73,7 +73,8 @@ class WABANotification(Notification):
 
         except:
             error = frappe.get_traceback()
-            frappe.log_error(title="Failed to send notification", message=error)
+            frappe.log_error(
+                title="Failed to send notification", message=error)
             logger.debug(error)
 
         super(WABANotification, self).send(doc)
@@ -135,7 +136,6 @@ def make_communication(
         template_name=whatsapp_business_template,
         doctype=doctype,
         docname=name,
-        media_link=file_url,
     )
 
 

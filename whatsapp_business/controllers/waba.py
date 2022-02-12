@@ -17,7 +17,7 @@ logger = frappe.logger("whatsapp_business", allow_site=frappe.local.site)
 class WABA(object):
     @classmethod
     def send_message(
-        cls, receiver_list, template_name, doctype=None, docname=None, media_link=None
+        cls, receiver_list, template_name, doctype=None, docname=None,
     ):
         if isinstance(receiver_list, string_types):
             receiver_list = json.loads(receiver_list)
@@ -30,7 +30,6 @@ class WABA(object):
                 template_name=template_name,
                 doctype=doctype,
                 docname=docname,
-                media_link=None,
             )
 
     def __init__(self):
@@ -44,7 +43,7 @@ class WABA(object):
         )
 
     def _send(
-        self, mobile_no="", template_name="", doctype=None, docname=None, media_link=None, template_doc={}
+        self, mobile_no="", template_name="", doctype=None, docname=None, template_doc={}
     ):
         """
         https://docs.360dialog.com/whatsapp-api/whatsapp-api/sandbox#send-template-message
@@ -112,14 +111,15 @@ class WABA(object):
                             {
                                 "type": "document",
                                 "document": {
-                                    "link": d.value
+                                    "link": frappe.render_template(d.value, {"doc": doc}),
+                                    "filename": "{}: {}".format(doc.doctype, doc.name)
                                 },
                             },
                         ],
                     }
                     components.append(comp)
 
-            parameters = [{"type": "text", "text": d.value}
+            parameters = [{"type": "text", "text": frappe.render_template(d.value, {"doc": doc})}
                           for d in template_doc.message_parameters if d.value and not cint(d.header)]
             if parameters:
                 comp = {
