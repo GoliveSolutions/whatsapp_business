@@ -65,7 +65,7 @@ class WABANotification(Notification):
                     )
 
                 if media_link:
-                    args["media_link"] = "{}{}".format(
+                    args["link"] = "{}{}".format(
                         frappe.utils.get_url(), media_link
                     )
 
@@ -136,6 +136,7 @@ def make_communication(
         template_name=whatsapp_business_template,
         doctype=doctype,
         docname=name,
+        link=file_url
     )
 
 

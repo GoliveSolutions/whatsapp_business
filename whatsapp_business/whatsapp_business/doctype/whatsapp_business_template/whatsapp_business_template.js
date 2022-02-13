@@ -32,6 +32,7 @@ frappe.ui.form.on("Whatsapp Business Template", {
               "waba_template_name",
               data.template_name.split(" (")[0]
             );
+            frm.set_value('language', data.template_name.split(' ').slice(-1)[0].replace(/\W/g, ''));
             frm.refresh_field("waba_template_name");
             dialog.hide();
           },
@@ -117,7 +118,6 @@ frappe.ui.form.on("Whatsapp Business Template", {
   },
 
   preview_message: function (frm) {
-    debugger;
 
     let template = {},
       message = "";

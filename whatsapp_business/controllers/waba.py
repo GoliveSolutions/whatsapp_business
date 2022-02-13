@@ -2,13 +2,13 @@
 # Copyright (c) 2020, GreyCube Technologies and Contributors
 # See license.txt
 from __future__ import unicode_literals
-
 import frappe
 from frappe.utils import cstr, cint
 from six import string_types
 import json
 import requests
 from frappe import _
+from os.path import basename
 
 
 logger = frappe.logger("whatsapp_business", allow_site=frappe.local.site)
@@ -17,7 +17,7 @@ logger = frappe.logger("whatsapp_business", allow_site=frappe.local.site)
 class WABA(object):
     @classmethod
     def send_message(
-        cls, receiver_list, template_name, doctype=None, docname=None,
+        cls, receiver_list, template_name, doctype=None, docname=None, link=""
     ):
         if isinstance(receiver_list, string_types):
             receiver_list = json.loads(receiver_list)
@@ -30,6 +30,7 @@ class WABA(object):
                 template_name=template_name,
                 doctype=doctype,
                 docname=docname,
+                link=link,
             )
 
     def __init__(self):
@@ -43,7 +44,7 @@ class WABA(object):
         )
 
     def _send(
-        self, mobile_no="", template_name="", doctype=None, docname=None, template_doc={}
+        self, mobile_no="", template_name="", doctype=None, docname=None, template_doc={}, link=""
     ):
         """
         https://docs.360dialog.com/whatsapp-api/whatsapp-api/sandbox#send-template-message
@@ -52,7 +53,7 @@ class WABA(object):
         headers = self.get_headers()
 
         message = self.build_message(
-            template_name, mobile_no, doctype, docname, template_doc=template_doc
+            template_name, mobile_no, doctype, docname, template_doc=template_doc, link=link
         )
 
         response = requests.request(
@@ -83,7 +84,7 @@ class WABA(object):
         return headers
 
     def build_message(
-        self, template_name, mobile_no, doctype=None, docname=None, template_doc={}
+        self, template_name, mobile_no, doctype=None, docname=None, template_doc={}, link=""
     ):
 
         doc, template_doc = {}, frappe._dict(template_doc)
@@ -99,27 +100,29 @@ class WABA(object):
         if self.settings.default_country_code and not mobile_no.startswith(self.settings.default_country_code):
             mobile_no = self.settings.default_country_code + mobile_no
 
-        mobile_no = self.settings.test_wa_id or mobile_no
+        mobile_no = self.settings.use_test_wa_id and self.settings.test_wa_id or mobile_no
 
         if template_doc.message_type == "template":
             components = []
             for d in template_doc.message_parameters:
                 if cint(d.header):
+                    link = link or (doc and frappe.render_template(
+                        d.value, {"doc": doc})) or d.value
                     comp = {
                         "type": "header",
                         "parameters": [
                             {
                                 "type": "document",
                                 "document": {
-                                    "link": frappe.render_template(d.value, {"doc": doc}),
-                                    "filename": "{}: {}".format(doc.doctype, doc.name)
+                                    "link": link,
+                                    "filename": basename(link)
                                 },
                             },
                         ],
                     }
                     components.append(comp)
 
-            parameters = [{"type": "text", "text": frappe.render_template(d.value, {"doc": doc})}
+            parameters = [{"type": "text", "text": doc and frappe.render_template(d.value, {"doc": doc}) or d.value}
                           for d in template_doc.message_parameters if d.value and not cint(d.header)]
             if parameters:
                 comp = {

@@ -5,6 +5,7 @@ Whatsapp Business Solution Providers Integration
 
 [https://docs.360dialog.com/whatsapp-api/whatsapp-api/messaging#check-contacts-and-send-messages](https://docs.360dialog.com/whatsapp-api/whatsapp-api/messaging#check-contacts-and-send-messages)
 
+[https://developers.facebook.com/docs/whatsapp/api/messages/media](https://developers.facebook.com/docs/whatsapp/api/messages/media)
 #### Check Contact Endpoints
 - To check if number is a valid Whatsapp number and get wa_id
 ```

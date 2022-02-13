@@ -10,6 +10,7 @@
   "api_key",
   "column_break_3",
   "default_country_code",
+  "use_test_wa_id",
   "test_wa_id"
  ],
  "fields": [
@@ -28,21 +29,31 @@
    "fieldtype": "Column Break"
   },
   {
+   "description": "This value will be prepended to all numbers, if the numbers do not start with this value. Leave this blank , if your mobile numbers already have the country code. <strong>Whatsapp messaging needs the County Code in the beginging of the mobile number</strong>",
    "fieldname": "default_country_code",
    "fieldtype": "Data",
    "label": "Default Country Code"
   },
   {
+   "depends_on": "eval:doc.use_test_wa_id",
    "description": "Whatsapp number for testing. If set, all messages will be sent to this number only.",
    "fieldname": "test_wa_id",
    "fieldtype": "Data",
-   "label": "Test WA Id"
+   "label": "Test WA Id",
+   "mandatory_depends_on": "eval:doc.use_test_wa_id"
+  },
+  {
+   "default": "0",
+   "description": "Select this flag to send all Whatsapp messages to the Whatsapp nmber set below. ",
+   "fieldname": "use_test_wa_id",
+   "fieldtype": "Check",
+   "label": "Use Test WA Id"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-02-12 04:56:08.064794",
+ "modified": "2022-02-13 07:27:17.173005",
  "modified_by": "Administrator",
  "module": "Whatsapp Business",
  "name": "Whatsapp Business Settings",

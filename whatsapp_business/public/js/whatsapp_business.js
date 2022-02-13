@@ -98,6 +98,49 @@ frappe.ui.form.on("Purchase Invoice", {
 });
 
 
+frappe.ui.form.on("Purchase Invoice", {
+  refresh: function (frm) {
+    setup_whatsapp_business(frm);
+  },
+});
+
+
+
+frappe.ui.form.on("Project", {
+  refresh: function (frm) {
+    setup_whatsapp_business(frm);
+  },
+});
+
+
+frappe.ui.form.on("Task", {
+  refresh: function (frm) {
+    setup_whatsapp_business(frm);
+  },
+});
+
+
+frappe.ui.form.on("Employee", {
+  refresh: function (frm) {
+    setup_whatsapp_business(frm);
+  },
+});
+
+
+frappe.ui.form.on("Expense Claim", {
+  refresh: function (frm) {
+    setup_whatsapp_business(frm);
+  },
+});
+
+
+frappe.ui.form.on("Employee Advance", {
+  refresh: function (frm) {
+    setup_whatsapp_business(frm);
+  },
+});
+
+
 
 
 // for testing
