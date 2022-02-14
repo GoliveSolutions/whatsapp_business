@@ -3,10 +3,6 @@
 
 frappe.ui.form.on("Whatsapp Business Template", {
   refresh: function (frm) {
-    frm.page.add_inner_button("Get Templates", function () {
-      frm.trigger("load_template_names");
-    });
-
     // end refresh
   },
 
@@ -91,17 +87,6 @@ frappe.ui.form.on("Whatsapp Business Template", {
         frm.set_value("rejected_reason", templates[0].rejected_reason);
         frm.set_value("status", templates[0].status);
         frm.refresh_fields();
-      },
-    });
-  },
-
-  load_template_names: function (frm) {
-    return frappe.call({
-      method: "whatsapp_business.controllers.waba.get_template_names",
-      callback: (r) => {
-        frm.set_df_property("waba_template_name", "options", r.message);
-        frm.refresh_field("waba_template_name");
-        console.log(r.message);
       },
     });
   },
