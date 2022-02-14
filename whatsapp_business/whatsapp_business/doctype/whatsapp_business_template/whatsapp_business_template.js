@@ -139,6 +139,11 @@ frappe.ui.form.on("Whatsapp Business Template", {
     }
   },
 
+  validate: function (frm) {
+    frm.events.preview_message(frm);
+  },
+
+
   //   end on
 });
 

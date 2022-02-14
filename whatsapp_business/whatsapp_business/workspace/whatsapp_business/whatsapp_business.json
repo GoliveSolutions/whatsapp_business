@@ -1,0 +1,64 @@
+{
+ "cards_label": "Bookmarks",
+ "category": "Modules",
+ "charts": [],
+ "creation": "2022-02-11 05:46:14.016275",
+ "developer_mode_only": 0,
+ "disable_user_customization": 0,
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "extends_another_page": 0,
+ "hide_custom": 0,
+ "icon": "quality-3",
+ "idx": 0,
+ "is_default": 0,
+ "is_standard": 1,
+ "label": "Whatsapp Business",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Whatsapp Business Template",
+   "link_to": "Whatsapp Business Template",
+   "link_type": "DocType",
+   "onboard": 0,
+   "only_for": "",
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Notification",
+   "link_to": "Notification",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Setup",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Whatsapp Business Settings",
+   "link_to": "Whatsapp Business Settings",
+   "link_type": "DocType",
+   "onboard": 0,
+   "only_for": "",
+   "type": "Link"
+  }
+ ],
+ "modified": "2022-02-14 11:25:01.443231",
+ "modified_by": "Administrator",
+ "module": "Whatsapp Business",
+ "name": "Whatsapp Business",
+ "owner": "Administrator",
+ "pin_to_bottom": 0,
+ "pin_to_top": 1,
+ "shortcuts": []
+}

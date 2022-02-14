@@ -95,6 +95,9 @@ class WABA(object):
         if not template_doc and template_name:
             template_doc = frappe.get_doc(
                 "Whatsapp Business Template", template_name).as_dict()
+        if not template_doc.get("is_enabled"):
+            frappe.throw("Selected template: %s is not enabled." %
+                         template_doc.name)
 
         mobile_no = cstr(mobile_no)
         if self.settings.default_country_code and not mobile_no.startswith(self.settings.default_country_code):

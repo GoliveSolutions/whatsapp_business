@@ -42,18 +42,21 @@ frappe.views.WhatsappComposer = class WhatsappComposer extends (
         me.dialog.fields_dict.whatsapp_business_template.set_value(data[0].name);
         me.toggle_document_fields(!data[0].message_type == 'template');
       }
+
+
+      this.dialog.sections[0].wrapper.addClass("to_section");
+      this.dialog.show();
+      if (this.frm) {
+        $(document).trigger("form-typing", [this.frm]);
+      }
+      if (this.cc || this.bcc) {
+        this.toggle_more_options(true);
+      }
+
+      this.prepare();
+
     });
 
-    this.dialog.sections[0].wrapper.addClass("to_section");
-    this.dialog.show();
-    if (this.frm) {
-      $(document).trigger("form-typing", [this.frm]);
-    }
-    if (this.cc || this.bcc) {
-      this.toggle_more_options(true);
-    }
-
-    this.prepare();
 
   }
 
