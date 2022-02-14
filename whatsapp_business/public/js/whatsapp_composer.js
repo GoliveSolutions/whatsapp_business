@@ -1,87 +1,11 @@
+
+const exclude_fields = ['option_toggle_button', 'recipients', 'subject', 'send_me_a_copy', 'send_read_receipt']
+
 frappe.views.WhatsappComposer = class WhatsappComposer extends (
   frappe.views.CommunicationComposer
 ) {
 
-
-  prepare() {
-    this.setup_print_language();
-    this.setup_print();
-    this.setup_attach();
-    if (this.dialog.fields_dict.sender) {
-      this.dialog.fields_dict.sender.set_value(this.sender || "");
-    }
-  }
-
-
-  make() {
-    var me = this;
-
-    this.dialog = new frappe.ui.Dialog({
-      title: this.title || this.subject || __("New WhatsApp Messsage"),
-      no_submit_on_enter: true,
-      fields: this.get_fields(),
-      primary_action_label: __("Send"),
-      size: "large",
-      primary_action: function () {
-        me.delete_saved_draft();
-        me.send_action();
-      },
-      minimizable: true,
-    });
-
-
-    // set default template
-    frappe.db.get_list("Whatsapp Business Template", {
-      filters: {
-        linked_doctype: me.frm.doc.doctype,
-        is_default_template: 1
-      },
-      fields: ["name", "message_type"]
-    }).then((data) => {
-      if (data.length) {
-        me.dialog.fields_dict.whatsapp_business_template.set_value(data[0].name);
-        me.toggle_document_fields(!data[0].message_type == 'template');
-      }
-
-
-      this.dialog.sections[0].wrapper.addClass("to_section");
-      this.dialog.show();
-      if (this.frm) {
-        $(document).trigger("form-typing", [this.frm]);
-      }
-      if (this.cc || this.bcc) {
-        this.toggle_more_options(true);
-      }
-
-      this.prepare();
-
-    });
-
-
-  }
-
-  toggle_document_fields(is_hidden) {
-    let me = this;
-    me.dialog.fields_dict.attach_document_print.set_value(!is_hidden);
-    for (let f in me.dialog.fields_dict) {
-      if (!['recipients', 'whatsapp_business_template', 'content'].includes(f)) {
-        me.dialog.set_df_property(f, 'hidden', is_hidden);
-      }
-    }
-    if (this.frm) {
-      const print_formats = frappe.meta.get_print_formats(this.frm.meta.name);
-      me.dialog.fields_dict.select_print_format.set_value(print_formats.length ? print_formats[0] : "Standard");
-    }
-
-    $(me.dialog.fields_dict.select_print_format.wrapper).toggle(!is_hidden);
-    me.dialog.refresh();
-
-    me.dialog.$body.find("div.form-page .form-section:gt(2)").toggle(!is_hidden)
-
-  }
-
-  get_fields() {
-    let me = this;
+  get_recipients() {
     let recipients = [];
     for (let o of Object.values(this.frm.fields_dict)) {
       if (o.df && o.df.options == "Phone") {
@@ -89,16 +13,20 @@ frappe.views.WhatsappComposer = class WhatsappComposer extends (
         break;
       };
     }
+    return recipients.join(",");
+  }
 
-    let fields = [
+  get_custom_fields() {
+
+    let _fields = [
       {
         label: __("To Mobile"),
         fieldtype: "Data",
         reqd: 1,
-        fieldname: "recipients",
-        default: recipients.join(","),
+        fieldname: "waba_recipients",
+        default: this.get_recipients(),
       },
-      { fieldtype: "Column Break", fieldname: 'cb1' },
+      { fieldtype: "Column Break" },
       {
         fieldtype: "Link",
         label: "Whatsapp Business Template",
@@ -110,74 +38,90 @@ frappe.views.WhatsappComposer = class WhatsappComposer extends (
             filters: { linked_doctype: this.frm.doc.doctype },
           };
         },
-        onchange: () => {
-          let templ = me.dialog.fields_dict["whatsapp_business_template"].value;
-          if (templ) {
-            frappe.model.with_doc("Whatsapp Business Template", templ, function () {
-              let template_doc = frappe.model.get_doc("Whatsapp Business Template", templ);
-              let message = frappe.render_template(template_doc.message, { doc: cur_frm.doc })
-
-              me.dialog.set_value("content", message);
-
-              frappe.timeout(0.6).then(() => {
-                // hide attachment fields if template is not a document template
-                if (cur_dialog) {
-                  me.toggle_document_fields(template_doc.message_type !== 'template')
-                  me.dialog.refresh();
-                }
-              });
-              // 
-            });
-          }
-          // 
-        },
-      },
-      { fieldtype: "Section Break", },
-      {
-        label: __("Message"),
-        fieldtype: "Text Editor",
-        fieldname: "content",
-        // onchange: frappe.utils.debounce(this.save_as_draft.bind(this), 300),
-        read_only: 1,
-      },
-      {
-        fieldtype: "Section Break",
-      },
-      {
-        fieldtype: "HTML",
-        options: `<div style="font-weight:bold">
-          Please select "Attach Document Print" <stong>OR</strong> one attachment to be sent with message
-            </div>`,
-        fieldname: "attach_html"
+        onchange: this.onchange_whatsapp_business_template.bind(this)
       },
       { fieldtype: "Section Break" },
-      {
-        label: __("Attach Document Print"),
-        fieldtype: "Check",
-        fieldname: "attach_document_print",
-      },
-      {
-        label: __("Select Print Format"),
-        fieldtype: "Select",
-        fieldname: "select_print_format",
-      },
-      {
-        label: __("Select Languages"),
-        fieldtype: "Select",
-        fieldname: "language_sel",
-        hidden: 1
-      },
+    ].concat(this.get_fields());
 
-      { fieldtype: "Column Break" },
-      {
-        label: __("Select Attachments"),
-        fieldtype: "HTML",
-        fieldname: "select_attachments",
-      },
-      { fieldtype: "Section Break" },
-    ];
-    return fields;
+    for (const f of _fields) {
+      if (exclude_fields.includes(f.fieldname)) {
+        f.hidden = 1;
+        f.reqd = 0;
+      }
+      else if (f.fieldname == "content") {
+        f.read_only = 1;
+      }
+    }
+
+    return _fields;
+
   }
+
+  onchange_whatsapp_business_template() {
+    let me = this;
+    console.log('changed template');
+
+    let templ = me.dialog.fields_dict["whatsapp_business_template"].value;
+    if (templ) {
+      frappe.model.with_doc("Whatsapp Business Template", templ, function () {
+        let template_doc = frappe.model.get_doc("Whatsapp Business Template", templ);
+        let message = frappe.render_template(template_doc.message, { doc: cur_frm.doc })
+        me.dialog.set_value("content", message);
+        frappe.timeout(0.6).then(() => {
+          // hide attachment fields if template is not a document template
+          if (cur_dialog) {
+            me.toggle_attach_fields(template_doc.message_type)
+            me.dialog.refresh();
+          }
+        });
+        // 
+      });
+    }
+    // end onchange_whatsapp_business_template
+  }
+
+  toggle_attach_fields(message_type) {
+    let is_hidden = message_type !== 'template'
+    this.dialog.$body.find("div.form-page .row.form-section:gt(3)").toggle(!is_hidden)
+  }
+
+  make() {
+    const me = this;
+
+    this.dialog = new frappe.ui.Dialog({
+      title: (this.title || this.subject || __("New WhatsApp Messsage")),
+      no_submit_on_enter: true,
+      fields: this.get_custom_fields(),
+      primary_action_label: __("Send"),
+      primary_action() {
+        me.send_action();
+      },
+      secondary_action_label: __("Discard"),
+      secondary_action() {
+        me.dialog.hide();
+        me.clear_cache();
+      },
+      size: 'large',
+      minimizable: true
+    });
+
+    $(this.dialog.$wrapper.find(".form-section").get(0)).addClass('to_section');
+
+    this.prepare();
+    this.dialog.show();
+
+    if (this.frm) {
+      $(document).trigger('form-typing', [this.frm]);
+    }
+  }
+
+
+  prepare() {
+    this.setup_print_language();
+    this.setup_print();
+    this.setup_attach();
+  }
+
 
   send_email(btn, form_values, selected_attachments, print_html, print_format) {
     var me = this;
@@ -190,7 +134,7 @@ frappe.views.WhatsappComposer = class WhatsappComposer extends (
       frappe.msgprint("Please select a <strong>single</strong> attachment only, to be sent on Whatsapp.")
     }
 
-    if (!form_values.recipients) {
+    if (!form_values.waba_recipients) {
       frappe.msgprint(__("Enter Whatsapp Recipient(s)"));
       return;
     }
@@ -208,7 +152,7 @@ frappe.views.WhatsappComposer = class WhatsappComposer extends (
     }
 
     let args = {
-      recipients: form_values.recipients,
+      recipients: form_values.waba_recipients,
       cc: form_values.cc,
       bcc: form_values.bcc,
       subject: form_values.subject || `${me.doc.doctype}-${me.doc.name}`,
@@ -232,7 +176,7 @@ frappe.views.WhatsappComposer = class WhatsappComposer extends (
       whatsapp_business_template: form_values.whatsapp_business_template,
     };
 
-    console.log(args)
+    // console.log(args)
 
     return frappe.call({
       method: "whatsapp_business.controllers.whatsapp_notification.make_communication",
@@ -275,4 +219,5 @@ frappe.views.WhatsappComposer = class WhatsappComposer extends (
       },
     });
   }
+
 };

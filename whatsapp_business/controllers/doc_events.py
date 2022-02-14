@@ -14,7 +14,7 @@ def on_validate_notification(doc, method):
         doc.message = frappe.db.get_value(
             "Whatsapp Business Template",
             doc.whatsapp_business_template_cf,
-            "template_body",
+            "message",
         )
 
         if doc.get("whatsapp_business_template_cf"):
