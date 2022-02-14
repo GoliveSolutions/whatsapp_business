@@ -61,6 +61,7 @@ frappe.views.WhatsappComposer = class WhatsappComposer extends (
     let me = this;
     console.log('changed template');
 
+
     let templ = me.dialog.fields_dict["whatsapp_business_template"].value;
     if (templ) {
       frappe.model.with_doc("Whatsapp Business Template", templ, function () {
@@ -71,13 +72,30 @@ frappe.views.WhatsappComposer = class WhatsappComposer extends (
           // hide attachment fields if template is not a document template
           if (cur_dialog) {
             me.toggle_attach_fields(template_doc.message_type)
-            me.dialog.refresh();
+            // me.dialog.refresh();
           }
         });
         // 
       });
     }
     // end onchange_whatsapp_business_template
+  }
+
+  set_default_template() {
+    let me = this;
+    // set default template
+    frappe.db.get_list("Whatsapp Business Template", {
+      filters: {
+        linked_doctype: me.frm.doc.doctype,
+        is_default_template: 1
+      },
+      fields: ["name", "message_type"]
+    }).then((data) => {
+      if (data.length) {
+        me.dialog.fields_dict.whatsapp_business_template.set_value(data[0].name);
+        me.toggle_attach_fields(data[0].message_type);
+      }
+    });
   }
 
   toggle_attach_fields(message_type) {
@@ -110,18 +128,18 @@ frappe.views.WhatsappComposer = class WhatsappComposer extends (
     this.prepare();
     this.dialog.show();
 
+    this.set_default_template();
+
     if (this.frm) {
       $(document).trigger('form-typing', [this.frm]);
     }
   }
-
 
   prepare() {
     this.setup_print_language();
     this.setup_print();
     this.setup_attach();
   }
-
 
   send_email(btn, form_values, selected_attachments, print_html, print_format) {
     var me = this;
